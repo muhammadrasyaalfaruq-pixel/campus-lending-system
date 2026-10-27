@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Profil Saya - PinjamKampus{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-xl-5">
+        <div class="p-5 card-modern">
+            <h2 class="mb-4 text-center">Profil Saya</h2>
+            {% if request.query_params.get('msg') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ request.query_params.get('msg') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            {% if request.query_params.get('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ request.query_params.get('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            <form method="post" action="/profile/update" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nama</label>
+                    <input type="text" name="name" class="form-control" value="{{ user_data.name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email (tidak dapat diubah)</label>
+                    <input type="email" class="form-control" value="{{ user_data.email }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">NIM / ID Mahasiswa</label>
+                    <input type="text" name="student_id" class="form-control" value="{{ user_data.student_id or '' }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">No. Telepon</label>
+                    <input type="text" name="phone" class="form-control" value="{{ user_data.phone or '' }}">
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary-modern">Simpan Perubahan</button>
+                </div>
+            </form>
+            <hr class="my-5">
+            <h3 class="mb-3 text-center">Ubah Kata Sandi</h3>
+            <form method="post" action="/profile/change-password" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Kata Sandi Lama</label>
+                    <input type="password" name="old_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Kata Sandi Baru</label>
+                    <input type="password" name="new_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" name="new_password_confirm" class="form-control" required>
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary-modern">Ubah Kata Sandi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
