@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Notifikasi - PinjamKampus{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Notifikasi</h1>
+<div class="list-group shadow-sm border-0">
+    {% for notif in notifications %}
+    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not notif.is_read %}bg-light border-start border-primary border-4{% endif %}">
+        <div>
+            <h6 class="mb-1">{{ notif.title }}</h6>
+            <p class="mb-1 text-muted">{{ notif.message }}</p>
+            <small class="text-secondary">{{ notif.created_at.strftime("%d-%m-%Y %H:%M") }}</small>
+        </div>
+        {% if not notif.is_read %}
+        <form method="post" action="/notifications/{{ notif.id }}/read">
+            <button class="btn btn-sm btn-outline-secondary">Tandai Dibaca</button>
+        </form>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="p-4 text-center text-muted">Belum ada notifikasi.</div>
+    {% endfor %}
+</div>
+{% endblock %}

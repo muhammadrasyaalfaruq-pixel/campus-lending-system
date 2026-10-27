@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - PinjamKampus{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Dashboard Admin</h1>
+        <p class="text-muted mb-0">Ringkasan aktivitas PinjamKampus.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="/admin/reports/loans/pdf" class="btn btn-outline-danger btn-sm">Download Laporan PDF</a>
+        <span class="badge text-bg-primary">Administrator</span>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Pengguna</div><div class="fs-2 fw-bold">{{ stats.users }}</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Alat</div><div class="fs-2 fw-bold">{{ stats.items }}</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Kategori</div><div class="fs-2 fw-bold">{{ stats.categories }}</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Pengajuan menunggu</div><div class="fs-2 fw-bold text-warning">{{ stats.pending_loans }}</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3"><h2 class="h5 mb-0">Pengajuan terbaru</h2></div>
+    <div class="card-body p-0">
+        {% if recent_loans %}
+        <div class="table-responsive"><table class="table table-hover mb-0">
+            <thead><tr><th>Kode</th><th>Peminjam</th><th>Tanggal ajukan</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for loan in recent_loans %}
+                <tr>
+                    <td>{{ loan.loan_code }}</td>
+                    <td>{{ loan.user.name }}</td>
+                    <td>{{ loan.created_at.strftime("%d-%m-%Y") }}</td>
+                    <td><span class="badge text-bg-secondary">{{ loan.status }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        {% else %}
+        <p class="text-muted text-center py-4 mb-0">Belum ada pengajuan peminjaman.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

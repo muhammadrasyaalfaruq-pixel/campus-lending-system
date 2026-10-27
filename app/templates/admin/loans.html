@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Kelola Pinjaman - PinjamKampus{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Kelola Pinjaman</h1>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle table-hover mb-0">
+            <thead><tr><th>Kode</th><th>Peminjam</th><th>Tujuan</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td>{{ loan.loan_code }}</td>
+                    <td>{{ loan.user.name }} ({{ loan.user.email }})</td>
+                    <td>{{ loan.purpose }}</td>
+                    <td>{{ loan.due_date.strftime("%d-%m-%Y") }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if loan.status == 'approved' %}bg-success
+                            {% elif loan.status == 'rejected' %}bg-danger
+                            {% elif loan.status == 'returned' %}bg-secondary
+                            {% else %}bg-warning text-dark{% endif %}">
+                            {{ loan.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if loan.status == 'pending' %}
+                        <form method="post" action="/admin/loans/{{ loan.id }}/approve" class="d-inline">
+                            <button class="btn btn-sm btn-success">Setujui</button>
+                        </form>
+                        <form method="post" action="/admin/loans/{{ loan.id }}/reject" class="d-inline">
+                            <button class="btn btn-sm btn-danger">Tolak</button>
+                        </form>
+                        {% elif loan.status == 'approved' %}
+                        <form method="post" action="/admin/loans/{{ loan.id }}/return" class="d-inline">
+                            <button class="btn btn-sm btn-primary">Kembalikan</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted small">Selesai</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">Belum ada pengajuan pinjaman.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
