@@ -55,6 +55,8 @@ def seed_data():
             ("Multimedia", "Peralatan foto, video, dan presentasi."),
             ("Laboratorium", "Peralatan praktikum dan penelitian."),
             ("Kegiatan Kampus", "Peralatan untuk acara dan organisasi mahasiswa."),
+            ("Komputer & IT", "Perangkat komputer dan jaringan untuk kebutuhan akademik."),
+            ("Olahraga", "Peralatan olahraga untuk unit kegiatan mahasiswa."),
         ]
         category_map = {}
         for name, description in categories:
@@ -75,6 +77,14 @@ def seed_data():
             ("Mikroskop Digital", "LAB-002", "Mikroskop digital untuk praktikum biologi.", 2, "Laboratorium"),
             ("Speaker Portable", "EVT-001", "Speaker portable untuk seminar dan kegiatan mahasiswa.", 3, "Kegiatan Kampus"),
             ("Kursi Lipat", "EVT-002", "Kursi lipat untuk acara dan kegiatan organisasi.", 20, "Kegiatan Kampus"),
+            ("Laptop ASUS VivoBook", "IT-001", "Laptop untuk presentasi, praktikum, dan kerja kelompok.", 8, "Komputer & IT"),
+            ("Mouse Wireless", "IT-002", "Mouse nirkabel untuk kebutuhan praktikum komputer.", 15, "Komputer & IT"),
+            ("Router WiFi", "IT-003", "Router untuk praktik konfigurasi jaringan komputer.", 4, "Komputer & IT"),
+            ("Kabel HDMI", "IT-004", "Kabel HDMI untuk menghubungkan laptop ke proyektor.", 12, "Komputer & IT"),
+            ("Bola Futsal", "SPT-001", "Bola futsal untuk latihan dan pertandingan antar mahasiswa.", 10, "Olahraga"),
+            ("Raket Badminton", "SPT-002", "Raket badminton untuk kegiatan unit olahraga kampus.", 12, "Olahraga"),
+            ("Bola Voli", "SPT-003", "Bola voli untuk latihan dan pertandingan kampus.", 8, "Olahraga"),
+            ("Matras Olahraga", "SPT-004", "Matras untuk senam, latihan bela diri, dan kegiatan olahraga.", 6, "Olahraga"),
         ]
         for name, code, description, stock, category_name in items:
             if not db.query(Item).filter(Item.code == code).first():

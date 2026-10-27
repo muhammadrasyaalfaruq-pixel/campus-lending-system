@@ -2,8 +2,24 @@
 {% block title %}Katalog Alat - PinjamKampus{% endblock %}
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-    <div><h1 class="h3 mb-1">Katalog Alat</h1><p class="text-muted mb-0">Pilih alat yang tersedia untuk dipinjam.</p></div>
-    {% if request.session.get("user", {}).get("role") == "admin" %}<a class="btn btn-primary" href="/admin/items"><i class="bi bi-gear me-1"></i>Kelola Alat</a>{% endif %}
+    <div>
+        <h1 class="h3 mb-1">Katalog Alat</h1>
+        <p class="text-muted mb-0">Pilih alat yang tersedia dan ajukan peminjaman secara langsung.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if request.session.get("user") and request.session.get("user", {}).get("role") != "admin" %}
+        <a class="btn btn-primary-modern d-inline-flex align-items-center gap-2" href="/loans/request">
+            <i class="bi bi-cart-plus"></i>
+            <span>Form Pengajuan</span>
+        </a>
+        {% endif %}
+        {% if request.session.get("user", {}).get("role") == "admin" %}
+        <a class="btn btn-primary-modern d-inline-flex align-items-center gap-2" href="/admin/items">
+            <i class="bi bi-gear"></i>
+            <span>Kelola Alat</span>
+        </a>
+        {% endif %}
+    </div>
 </div>
 
 <div class="mb-4 d-flex gap-2 flex-wrap">
@@ -23,10 +39,15 @@
                 <span class="badge badge-soft-primary align-self-start mb-2">{{ item.category.name }}</span>
                 <h2 class="h5 fw-bold">{{ item.name }}</h2>
                 <p class="small text-muted mb-3">{{ item.description or "Belum ada deskripsi." }}</p>
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                    <span class="small {% if item.available_stock > 0 %}text-success{% else %}text-danger{% endif %}"><i class="bi bi-boxes me-1"></i>{{ item.available_stock }} tersedia</span>
+                <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
+                    <span class="small {% if item.available_stock > 0 %}text-success{% else %}text-danger{% endif %} fw-semibold"><i class="bi bi-boxes me-1"></i>{{ item.available_stock }} tersedia</span>
                     <span class="badge text-bg-secondary">{{ item.condition }}</span>
                 </div>
+                {% if request.session.get("user", {}).get("role") == "user" and item.available_stock > 0 %}
+                <a href="/loans/request" class="btn btn-sm btn-primary-modern w-100 mt-3">Ajukan Pinjaman</a>
+                {% elif not request.session.get("user") and item.available_stock > 0 %}
+                <a href="/auth/login" class="btn btn-sm btn-outline-primary w-100 mt-3">Login untuk Meminjam</a>
+                {% endif %}
             </div>
         </div>
     </div>

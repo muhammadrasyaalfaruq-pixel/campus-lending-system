@@ -29,11 +29,12 @@
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 {% if request.session.get("user") %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown">
-                            <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center text-primary" style="width: 36px; height: 36px;">
+                        <a class="user-dropdown-btn dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar-circle">
                                 <i class="bi bi-person-fill"></i>
                             </div>
                             <span>{{ request.session.get("user").get("name") }}</span>
+                            <i class="bi bi-chevron-down user-arrow-icon"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm p-2 rounded-3">
                             {% if request.session.get("user").get("role") == "admin" %}
