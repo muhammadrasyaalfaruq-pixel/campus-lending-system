@@ -17,7 +17,8 @@
                     <td>{{ loan.due_date.strftime("%d-%m-%Y") }}</td>
                     <td>
                         <span class="badge 
-                            {% if loan.status == 'approved' %}bg-success
+                            {% if loan.status == 'approved' %}bg-info text-dark
+                            {% elif loan.status == 'borrowed' %}bg-primary
                             {% elif loan.status == 'rejected' %}bg-danger
                             {% elif loan.status == 'returned' %}bg-secondary
                             {% else %}bg-warning text-dark{% endif %}">
@@ -33,6 +34,10 @@
                             <button class="btn btn-sm btn-danger">Tolak</button>
                         </form>
                         {% elif loan.status == 'approved' %}
+                        <form method="post" action="/admin/loans/{{ loan.id }}/borrow" class="d-inline">
+                            <button class="btn btn-sm btn-info text-white">Serahkan</button>
+                        </form>
+                        {% elif loan.status == 'borrowed' %}
                         <form method="post" action="/admin/loans/{{ loan.id }}/return" class="d-inline">
                             <button class="btn btn-sm btn-primary">Kembalikan</button>
                         </form>

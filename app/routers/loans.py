@@ -184,19 +184,42 @@ async def reject_loan(loan_id: int, request: Request, db: Session = Depends(get_
     return RedirectResponse(url="/admin/loans", status_code=303)
 
 
+@router.post("/admin/loans/{loan_id}/borrow")
+async def borrow_loan(loan_id: int, request: Request, db: Session = Depends(get_db)):
+    if not request.session.get("user") or request.session["user"]["role"] != "admin":
+        return RedirectResponse(url="/auth/login", status_code=303)
+    loan = db.get(Loan, loan_id)
+    if not loan or loan.status != "approved":
+        raise HTTPException(status_code=400, detail="Loan not approved")
+    loan.status = "borrowed"
+    db.commit()
+    db.add(
+        Notification(
+            user_id=loan.user_id,
+            loan_id=loan.id,
+            title="Barang telah diserahkan",
+            message=f"Peminjaman {loan.loan_code} aktif. Harap kembalikan sebelum {loan.due_date.strftime('%d-%m-%Y')}.",
+        )
+    )
+    db.commit()
+    return RedirectResponse(url="/admin/loans", status_code=303)
+
+
 @router.post("/admin/loans/{loan_id}/return")
 async def return_loan(loan_id: int, request: Request, db: Session = Depends(get_db)):
     if not request.session.get("user") or request.session["user"]["role"] != "admin":
         return RedirectResponse(url="/auth/login", status_code=303)
     loan = db.get(Loan, loan_id)
-    if not loan or loan.status != "borrowed":
+    if not loan:
+        raise HTTPException(status_code=404, detail="Loan not found")
+    if loan.status != "borrowed":
         raise HTTPException(status_code=400, detail="Loan not borrowed")
     # Process each detail
     total_fine = 0
     for detail in loan.details:
         item = db.get(Item, detail.item_id)
         # Restore stock
-        item.available_stock += detail.return_quantity or detail.quantity
+        item.available_stock += detail.returned_quantity or detail.quantity
         # Calculate late days
         today = date.today()
         if today > loan.due_date:

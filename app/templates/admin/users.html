@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Kelola Pengguna - PinjamKampus{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h1 class="mb-1" style="font-size:1.75rem;">Kelola Pengguna</h1>
+        <p class="text-secondary mb-0">Manajemen akun pengguna dan peran sistem.</p>
+    </div>
+    <a href="/admin" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Add User Form -->
+    <div class="col-lg-4">
+        <div class="card-modern p-4 h-100">
+            <h2 class="h5 mb-3"><i class="bi bi-person-plus me-2 text-primary"></i>Tambah Pengguna</h2>
+            <form method="post" action="/admin/users">
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Nama Lengkap</label>
+                    <input class="form-control" name="name" maxlength="100" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Email</label>
+                    <input class="form-control" type="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">NIM / Student ID</label>
+                    <input class="form-control" name="student_id" maxlength="50">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Nomor HP</label>
+                    <input class="form-control" name="phone" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Password</label>
+                    <input class="form-control" type="password" name="password" required minlength="6">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Peran</label>
+                    <select class="form-select" name="role_id" required>
+                        {% for role in roles %}
+                        <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="btn btn-primary-modern w-100" type="submit">
+                    <i class="bi bi-plus-lg me-1"></i>Tambah Pengguna
+                </button>
+            </form>
+
+            <hr class="my-4">
+
+            <h3 class="h6 mb-3"><i class="bi bi-shield-check me-2 text-primary"></i>Kelola Peran</h3>
+            <form method="post" action="/admin/roles" class="d-flex gap-2 mb-3">
+                <input class="form-control form-control-sm" name="name" placeholder="Nama peran baru" maxlength="50" required>
+                <button class="btn btn-sm btn-outline-primary" type="submit" style="white-space:nowrap">Tambah</button>
+            </form>
+            <ul class="list-group list-group-flush">
+                {% for role in roles %}
+                <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                    <span class="badge badge-soft-primary">{{ role.name }}</span>
+                    <span class="text-muted small me-auto ms-2">{{ role.users|length }} pengguna</span>
+                    {% if not role.users %}
+                    <form method="post" action="/admin/roles/{{ role.id }}/delete" onsubmit="return confirm('Hapus peran ini?')">
+                        <button class="btn btn-sm btn-outline-danger py-0 px-2">Hapus</button>
+                    </form>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="list-group-item px-0 text-muted small">Belum ada peran.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="col-lg-8">
+        <div class="card-modern overflow-hidden">
+            <div class="px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h2 class="mb-0 h5"><i class="bi bi-people me-2 text-primary"></i>Daftar Pengguna ({{ users|length }})</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>Pengguna</th>
+                            <th>NIM</th>
+                            <th>Peran</th>
+                            <th>Terdaftar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary" style="width:34px;height:34px;flex-shrink:0;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ user.name }}</div>
+                                        <small class="text-secondary">{{ user.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-secondary">{{ user.student_id or "-" }}</td>
+                            <td>
+                                {% if user.role.name == "admin" %}
+                                    <span class="badge badge-soft-danger">{{ user.role.name }}</span>
+                                {% else %}
+                                    <span class="badge badge-soft-primary">{{ user.role.name }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-secondary small">{{ user.created_at.strftime("%d %b %Y") }}</td>
+                            <td class="text-nowrap">
+                                <a href="/admin/users/{{ user.id }}/edit" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if user.id != request.session.get("user", {}).get("id") and not user.loans %}
+                                <form method="post" action="/admin/users/{{ user.id }}/delete" class="d-inline" onsubmit="return confirm('Hapus pengguna {{ user.name }}?')">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">Belum ada pengguna.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

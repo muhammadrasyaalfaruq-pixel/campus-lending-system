@@ -105,6 +105,27 @@ async def create_category(request: Request, name: str = Form(...), description: 
     return RedirectResponse("/admin/items", status_code=303)
 
 
+@router.post("/admin/categories/{category_id}/update")
+async def update_category(
+    category_id: int,
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    if redirect := admin_redirect(request):
+        return redirect
+    category = db.get(Category, category_id)
+    if not category:
+        return RedirectResponse("/admin/items", status_code=303)
+    name = name.strip()
+    duplicate = db.query(Category).filter(Category.name == name, Category.id != category_id).first()
+    if name and not duplicate:
+        category.name = name
+        category.description = description.strip() or None
+        db.commit()
+    return RedirectResponse("/admin/items", status_code=303)
+
 @router.post("/admin/categories/{category_id}/delete")
 async def delete_category(category_id: int, request: Request, db: Session = Depends(get_db)):
     if redirect := admin_redirect(request):

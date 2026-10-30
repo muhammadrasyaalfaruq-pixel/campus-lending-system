@@ -145,7 +145,14 @@ pinjamkampus/
 - `POST /notifications/{id}/read` – Tandai dibaca
 
 ### Admin
-- `GET /admin` – Dashboard admin
+- `GET /admin` – Dashboard admin dengan ringkasan status pinjaman dan aksi cepat
+- `GET /admin/users` – Kelola pengguna dan role
+- `POST /admin/users` – Tambah pengguna
+- `GET /admin/users/{id}/edit` – Form edit pengguna
+- `POST /admin/users/{id}/update` – Simpan perubahan pengguna atau reset password
+- `POST /admin/users/{id}/delete` – Hapus pengguna tanpa riwayat pinjaman
+- `POST /admin/roles` – Tambah role
+- `POST /admin/roles/{id}/delete` – Hapus role yang belum dipakai
 - `GET /admin/reports/loans/pdf` – Download laporan PDF
 
 ## Teknologi

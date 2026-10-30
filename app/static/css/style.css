@@ -416,3 +416,113 @@ footer {
     backdrop-filter: blur(10px);
     border-top: 1px solid rgba(226, 232, 240, 0.5);
 }
+
+/* Missing soft badge variants */
+.badge-soft-info {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    color: #0891b2;
+    font-weight: 600;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.badge-soft-secondary {
+    background: linear-gradient(135deg, rgba(100, 116, 139, 0.12), rgba(100, 116, 139, 0.04));
+    color: #475569;
+    font-weight: 600;
+    border: 1px solid rgba(100, 116, 139, 0.25);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* Admin greeting banner */
+.admin-greeting {
+    background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #0e7490 100%);
+    border-radius: 1.5rem;
+    padding: 1.75rem 2rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.admin-greeting::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    right: -5%;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.admin-greeting h2 {
+    color: #fff;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.25rem;
+}
+
+.admin-greeting p {
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.admin-greeting .greeting-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50rem;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.85rem;
+}
+
+/* Stat card link wrapper – remove hover lift on link, keep it on card */
+a.stat-card-link {
+    text-decoration: none;
+    display: block;
+}
+
+a.stat-card-link .stat-card {
+    height: 100%;
+}
+
+/* Status mini-cards inside breakdown */
+.status-mini {
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.status-mini:hover {
+    transform: translateY(-3px);
+}
+
+/* Quick action buttons */
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem 1rem;
+    border-radius: 0.85rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid transparent;
+}
+
+.quick-action-btn:hover {
+    transform: translateX(4px);
+}
