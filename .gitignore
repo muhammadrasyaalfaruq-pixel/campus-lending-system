@@ -23,3 +23,4 @@ Thumbs.db
 # Project specific
 app/static/uploads/*
 !app/static/uploads/.gitkeep
+!app/static/uploads/*.jpg

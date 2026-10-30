@@ -70,24 +70,25 @@ def seed_data():
             category_map[name] = category
 
         items = [
-            ("Kamera DSLR Canon", "CAM-001", "Kamera untuk dokumentasi acara dan tugas multimedia.", 3, "Multimedia"),
-            ("Proyektor Epson", "PRO-001", "Proyektor HD untuk presentasi kelas dan kegiatan kampus.", 4, "Multimedia"),
-            ("Tripod Kamera", "TRI-001", "Tripod stabil untuk pengambilan foto dan video.", 5, "Multimedia"),
-            ("Multimeter Digital", "LAB-001", "Alat ukur tegangan, arus, dan resistansi.", 6, "Laboratorium"),
-            ("Mikroskop Digital", "LAB-002", "Mikroskop digital untuk praktikum biologi.", 2, "Laboratorium"),
-            ("Speaker Portable", "EVT-001", "Speaker portable untuk seminar dan kegiatan mahasiswa.", 3, "Kegiatan Kampus"),
-            ("Kursi Lipat", "EVT-002", "Kursi lipat untuk acara dan kegiatan organisasi.", 20, "Kegiatan Kampus"),
-            ("Laptop ASUS VivoBook", "IT-001", "Laptop untuk presentasi, praktikum, dan kerja kelompok.", 8, "Komputer & IT"),
-            ("Mouse Wireless", "IT-002", "Mouse nirkabel untuk kebutuhan praktikum komputer.", 15, "Komputer & IT"),
-            ("Router WiFi", "IT-003", "Router untuk praktik konfigurasi jaringan komputer.", 4, "Komputer & IT"),
-            ("Kabel HDMI", "IT-004", "Kabel HDMI untuk menghubungkan laptop ke proyektor.", 12, "Komputer & IT"),
-            ("Bola Futsal", "SPT-001", "Bola futsal untuk latihan dan pertandingan antar mahasiswa.", 10, "Olahraga"),
-            ("Raket Badminton", "SPT-002", "Raket badminton untuk kegiatan unit olahraga kampus.", 12, "Olahraga"),
-            ("Bola Voli", "SPT-003", "Bola voli untuk latihan dan pertandingan kampus.", 8, "Olahraga"),
-            ("Matras Olahraga", "SPT-004", "Matras untuk senam, latihan bela diri, dan kegiatan olahraga.", 6, "Olahraga"),
+            ("Kamera DSLR Canon", "CAM-001", "Kamera untuk dokumentasi acara dan tugas multimedia.", 3, "Multimedia", "/static/uploads/camera.jpg"),
+            ("Proyektor Epson", "PRO-001", "Proyektor HD untuk presentasi kelas dan kegiatan kampus.", 4, "Multimedia", "/static/uploads/projector.jpg"),
+            ("Tripod Kamera", "TRI-001", "Tripod stabil untuk pengambilan foto dan video.", 5, "Multimedia", "/static/uploads/tripod.jpg"),
+            ("Multimeter Digital", "LAB-001", "Alat ukur tegangan, arus, dan resistansi.", 6, "Laboratorium", "/static/uploads/multimeter.jpg"),
+            ("Mikroskop Digital", "LAB-002", "Mikroskop digital untuk praktikum biologi.", 2, "Laboratorium", "/static/uploads/microscope.jpg"),
+            ("Speaker Portable", "EVT-001", "Speaker portable untuk seminar dan kegiatan mahasiswa.", 3, "Kegiatan Kampus", "/static/uploads/speaker.jpg"),
+            ("Kursi Lipat", "EVT-002", "Kursi lipat untuk acara dan kegiatan organisasi.", 20, "Kegiatan Kampus", "/static/uploads/chair.jpg"),
+            ("Laptop ASUS VivoBook", "IT-001", "Laptop untuk presentasi, praktikum, dan kerja kelompok.", 8, "Komputer & IT", "/static/uploads/laptop.jpg"),
+            ("Mouse Wireless", "IT-002", "Mouse nirkabel untuk kebutuhan praktikum komputer.", 15, "Komputer & IT", "/static/uploads/mouse.jpg"),
+            ("Router WiFi", "IT-003", "Router untuk praktik konfigurasi jaringan komputer.", 4, "Komputer & IT", "/static/uploads/router.jpg"),
+            ("Kabel HDMI", "IT-004", "Kabel HDMI untuk menghubungkan laptop ke proyektor.", 12, "Komputer & IT", "/static/uploads/hdmi.jpg"),
+            ("Bola Futsal", "SPT-001", "Bola futsal untuk latihan dan pertandingan antar mahasiswa.", 10, "Olahraga", "/static/uploads/futsal.jpg"),
+            ("Raket Badminton", "SPT-002", "Raket badminton untuk kegiatan unit olahraga kampus.", 12, "Olahraga", "/static/uploads/badminton.jpg"),
+            ("Bola Voli", "SPT-003", "Bola voli untuk latihan dan pertandingan kampus.", 8, "Olahraga", "/static/uploads/volleyball.jpg"),
+            ("Matras Olahraga", "SPT-004", "Matras untuk senam, latihan bela diri, dan kegiatan olahraga.", 6, "Olahraga", "/static/uploads/mat.jpg"),
         ]
-        for name, code, description, stock, category_name in items:
-            if not db.query(Item).filter(Item.code == code).first():
+        for name, code, description, stock, category_name, image_path in items:
+            existing = db.query(Item).filter(Item.code == code).first()
+            if not existing:
                 db.add(Item(
                     name=name,
                     code=code,
@@ -96,8 +97,12 @@ def seed_data():
                     available_stock=stock,
                     condition="Baik",
                     category_id=category_map[category_name].id,
+                    image_path=image_path,
                 ))
                 print(f"Alat dibuat: {name}")
+            elif not existing.image_path:
+                existing.image_path = image_path
+                print(f"Image diupdate: {name}")
         db.commit()
 
     finally:
