@@ -1,0 +1,78 @@
+Table roles {
+  id int [pk, increment]
+  name varchar
+}
+
+Table users {
+  id int [pk, increment]
+  role_id int [ref: > roles.id]
+  name varchar
+  email varchar
+  password_hash varchar
+  student_id varchar
+  phone varchar
+  created_at datetime
+}
+
+Table categories {
+  id int [pk, increment]
+  name varchar
+  description text
+}
+
+Table items {
+  id int [pk, increment]
+  category_id int [ref: > categories.id]
+  code varchar
+  name varchar
+  description text
+  total_stock int
+  available_stock int
+  condition varchar
+  image_path varchar
+  created_at datetime
+}
+
+Table loans {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  approved_by int [ref: > users.id]
+  loan_code varchar
+  purpose text
+  borrow_date date
+  due_date date
+  status varchar
+  created_at datetime
+}
+
+Table loan_details {
+  id int [pk, increment]
+  loan_id int [ref: > loans.id]
+  item_id int [ref: > items.id]
+  quantity int
+  returned_quantity int
+  condition_before varchar
+  condition_after varchar
+  return_date date
+  return_note text
+}
+
+Table fines {
+  id int [pk, increment]
+  loan_detail_id int [ref: - loan_details.id]
+  days_late int
+  rate_per_day decimal
+  amount decimal
+  payment_status varchar
+  paid_at datetime
+}
+
+Table notifications {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  loan_id int [ref: > loans.id]
+  title varchar
+  message text
+  is_read boolean
+  created_at datetime
+}
