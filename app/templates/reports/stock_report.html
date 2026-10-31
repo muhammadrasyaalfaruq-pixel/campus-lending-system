@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Laporan Status Inventaris</h2>
+        <a href="/reports/export/stock-pdf" class="btn btn-success"><i class="bi bi-file-earmark-pdf"></i> Download PDF Stok</a>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Nama Barang</th>
+                        <th>Kategori</th>
+                        <th>Total Stok</th>
+                        <th>Stok Tersedia</th>
+                        <th>Kondisi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in items %}
+                    <tr>
+                        <td><code>{{ i.code }}</code></td>
+                        <td>{{ i.name }}</td>
+                        <td>{{ i.category.name if i.category else '-' }}</td>
+                        <td>{{ i.total_stock }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'danger' if i.available_stock == 0 else 'success' }}">
+                                {{ i.available_stock }}
+                            </span>
+                        </td>
+                        <td>{{ i.condition }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

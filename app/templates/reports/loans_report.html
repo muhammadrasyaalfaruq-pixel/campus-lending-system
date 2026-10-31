@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Laporan Rekapitulasi Peminjaman</h2>
+        <a href="/reports/export/loans-pdf" class="btn btn-danger"><i class="bi bi-file-earmark-pdf"></i> Download PDF Laporan</a>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kode Pinjam</th>
+                        <th>Peminjam</th>
+                        <th>Tgl Pinjam</th>
+                        <th>Batas Kembali</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in loans %}
+                    <tr>
+                        <td>{{ l.id }}</td>
+                        <td><code>{{ l.loan_code }}</code></td>
+                        <td>{{ l.user.name }}</td>
+                        <td>{{ l.borrow_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ l.due_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if l.status == 'returned' else 'primary' if l.status == 'approved' else 'warning' }}">
+                                {{ l.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

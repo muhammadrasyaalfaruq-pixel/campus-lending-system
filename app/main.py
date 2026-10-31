@@ -22,9 +22,10 @@ templates = Jinja2Templates(directory="app/templates")
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-from app.routers import auth, admin, items, loans, notifications, profile
+from app.routers import auth, admin, items, loans, notifications, profile, reports
 app.include_router(auth.router, prefix="/auth")
 app.include_router(admin.router, prefix="/admin")
+app.include_router(reports.router)
 app.include_router(items.router)
 app.include_router(loans.router)
 app.include_router(notifications.router)

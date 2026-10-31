@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Laporan Denda</h2>
+    <div class="card shadow-sm"><div class="card-body table-responsive">
+        <table class="table table-striped">
+            <thead><tr><th>Peminjam</th><th>Kode Pinjam</th><th>Hari Terlambat</th><th>Total Denda</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for f in fines %}
+                <tr>
+                    <td>{{ f.loan_detail.loan.user.name }}</td>
+                    <td>{{ f.loan_detail.loan.loan_code }}</td>
+                    <td>{{ f.days_late }}</td>
+                    <td>Rp {{ "{:,.0f}".format(f.amount).replace(',', '.') }}</td>
+                    <td>{{ f.payment_status }}</td>
+                </tr>
+            {% else %}<tr><td colspan="5">Belum ada data denda.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div></div>
+</div>
+{% endblock %}
