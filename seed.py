@@ -1,8 +1,9 @@
-from app.database import SessionLocal
+from app.database import SessionLocal, Base, engine
 from app.models.entities import Category, Item, Role, User
 from app.services.auth_service import hash_password
 
 def seed_data():
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         admin_role = db.query(Role).filter(Role.name == "admin").first()

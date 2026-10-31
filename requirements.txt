@@ -1,4 +1,4 @@
-fastapi==0.115.0
+﻿fastapi==0.115.0
 uvicorn[standard]==0.32.0
 sqlalchemy==2.0.35
 pymysql==1.1.1
@@ -13,3 +13,4 @@ reportlab==4.2.5
 pillow==11.0.0
 qrcode==8.2
 email-validator==2.2.0
+a2wsgi==1.10.10
