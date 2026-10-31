@@ -11,6 +11,9 @@ Sistem manajemen peminjaman alat/barang di kampus dengan FastAPI, SQLAlchemy, da
 - **Dashboard Admin** – Ringkasan statistik, persetujuan pinjaman, kelola alat
 - **Laporan PDF** – Export riwayat peminjaman
 - **Notifikasi** – User & admin menerima notifikasi status pinjam
+- **Tiket QR Peminjaman** – QR untuk verifikasi pengambilan atau pengembalian alat
+- **Bukti Pengembalian PDF** – Peminjam mengunduh bukti setelah pinjaman selesai, termasuk kondisi alat dan tanggal pengembalian
+- **Pemeriksaan Kondisi Alat** – Admin mencatat kondisi dan catatan tiap alat saat menerima pengembalian
 
 ## Persyaratan
 
@@ -107,6 +110,9 @@ pinjamkampus/
 │       ├── loans/
 │       └── notifications/
 ├── migrations/                  # Alembic migrations
+├── erd/                         # Diagram relasi entitas basis data (Mermaid & DBML)
+│   ├── README.md                # Dokumentasi relasi & Mermaid diagram
+│   └── schema.dbml              # Schema file untuk dbdiagram.io
 ├── alembic.ini                 # Alembic config
 ├── seed.py                     # Seeder admin & user role
 ├── requirements.txt            # Dependencies

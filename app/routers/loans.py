@@ -1,10 +1,16 @@
+import io
 import os
 from datetime import date, datetime, timedelta
 from typing import List
 
+import qrcode
 from fastapi import APIRouter, Depends, Form, Request, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
@@ -41,6 +47,99 @@ async def my_loans(request: Request, db: Session = Depends(get_db)):
         {"request": request, "loans": loans},
     )
 
+@router.get("/loans/{loan_id}/qr")
+async def loan_qr(loan_id: int, request: Request, db: Session = Depends(get_db)):
+    user = current_user(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Login diperlukan")
+
+    loan = db.get(Loan, loan_id)
+    if not loan or (loan.user_id != user.id and user.role.name != "admin"):
+        raise HTTPException(status_code=404, detail="Loan not found")
+    if loan.status not in ("approved", "borrowed"):
+        raise HTTPException(status_code=400, detail="QR hanya tersedia untuk pinjaman disetujui atau aktif")
+
+    ticket_url = str(request.url_for("loan_ticket", loan_code=loan.loan_code))
+    qr = qrcode.make(ticket_url)
+    output = io.BytesIO()
+    qr.save(output, format="PNG")
+    output.seek(0)
+    return StreamingResponse(output, media_type="image/png", headers={"Cache-Control": "no-store"})
+
+@router.get("/loans/ticket/{loan_code}", response_class=HTMLResponse, name="loan_ticket")
+async def loan_ticket(loan_code: str, request: Request, db: Session = Depends(get_db)):
+    user = current_user(request, db)
+    if not user:
+        return RedirectResponse("/auth/login", status_code=303)
+
+    loan = (
+        db.query(Loan)
+        .options(joinedload(Loan.user), joinedload(Loan.details).joinedload(LoanDetail.item))
+        .filter(Loan.loan_code == loan_code)
+        .first()
+    )
+    if not loan or (loan.user_id != user.id and user.role.name != "admin"):
+        raise HTTPException(status_code=404, detail="Loan not found")
+
+    return templates.TemplateResponse(
+        "loans/ticket.html",
+        {"request": request, "loan": loan},
+    )
+
+@router.get("/loans/{loan_id}/return-pdf")
+async def user_return_pdf(loan_id: int, request: Request, db: Session = Depends(get_db)):
+    user = current_user(request, db)
+    if not user:
+        return RedirectResponse("/auth/login", status_code=303)
+
+    loan = db.get(Loan, loan_id)
+    if not loan or (loan.user_id != user.id and user.role.name != "admin"):
+        raise HTTPException(status_code=404, detail="Loan not found")
+    if loan.status != "returned":
+        raise HTTPException(status_code=400, detail="Bukti PDF hanya untuk pinjaman yang sudah dikembalikan")
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph(f"<b>Bukti Pengembalian Alat - {loan.loan_code}</b>", styles["Title"]))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"Peminjam: {loan.user.name} | Tanggal Pinjam: {loan.borrow_date.strftime('%d-%m-%Y')} | Batas Kembali: {loan.due_date.strftime('%d-%m-%Y')}", styles["Normal"]))
+    elements.append(Spacer(1, 15))
+
+    data = [["Item", "Jumlah", "Kondisi Awal", "Kondisi Akhir", "Tanggal Kembali"]]
+    for d in loan.details:
+        data.append([
+            d.item.name,
+            str(d.quantity),
+            d.condition_before or "Baik",
+            d.condition_after or "Baik",
+            d.return_date.strftime("%d-%m-%Y") if d.return_date else "-",
+        ])
+
+    table = Table(data, colWidths=[220, 60, 120, 120, 110])
+    table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0d6efd")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, 0), 10),
+            ("FONTSIZE", (0, 1), (-1, -1), 9),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8f9fa")]),
+        ])
+    )
+    elements.append(table)
+    doc.build(elements)
+    buffer.seek(0)
+
+    return Response(
+        content=buffer.getvalue(),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=Bukti_{loan.loan_code}.pdf"},
+    )
 
 @router.get("/loans/request", response_class=HTMLResponse)
 async def loan_form(request: Request, db: Session = Depends(get_db)):
@@ -206,7 +305,13 @@ async def borrow_loan(loan_id: int, request: Request, db: Session = Depends(get_
 
 
 @router.post("/admin/loans/{loan_id}/return")
-async def return_loan(loan_id: int, request: Request, db: Session = Depends(get_db)):
+async def return_loan(
+    loan_id: int,
+    request: Request,
+    condition_after: List[str] = Form(...),
+    return_notes: List[str] = Form(...),
+    db: Session = Depends(get_db),
+):
     if not request.session.get("user") or request.session["user"]["role"] != "admin":
         return RedirectResponse(url="/auth/login", status_code=303)
     loan = db.get(Loan, loan_id)
@@ -214,14 +319,19 @@ async def return_loan(loan_id: int, request: Request, db: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Loan not found")
     if loan.status != "borrowed":
         raise HTTPException(status_code=400, detail="Loan not borrowed")
-    # Process each detail
+    if len(condition_after) != len(loan.details) or len(return_notes) != len(loan.details):
+        raise HTTPException(status_code=400, detail="Data pengembalian tidak lengkap")
+
     total_fine = 0
-    for detail in loan.details:
+    today = date.today()
+    for detail, final_condition, note in zip(loan.details, condition_after, return_notes):
         item = db.get(Item, detail.item_id)
-        # Restore stock
-        item.available_stock += detail.returned_quantity or detail.quantity
+        detail.returned_quantity = detail.quantity
+        detail.return_date = today
+        detail.condition_after = final_condition
+        detail.return_note = note.strip() or None
+        item.available_stock += detail.quantity
         # Calculate late days
-        today = date.today()
         if today > loan.due_date:
             days_late = (today - loan.due_date).days
             fine_amount = days_late * FINE_RATE * detail.quantity

@@ -1,6 +1,6 @@
 import io
 from fastapi import APIRouter, Depends, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape

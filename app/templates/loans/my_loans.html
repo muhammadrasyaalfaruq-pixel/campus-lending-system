@@ -25,11 +25,21 @@
                         </span>
                     </td>
                     <td>
-                        <ul class="list-unstyled mb-0 small">
+                        <ul class="list-unstyled mb-2 small">
                             {% for detail in loan.details %}
                             <li>{{ detail.item.name }} ({{ detail.quantity }} unit)</li>
                             {% endfor %}
                         </ul>
+                        {% if loan.status in ["approved", "borrowed"] %}
+                        <a class="btn btn-sm btn-outline-primary" href="/loans/ticket/{{ loan.loan_code }}">
+                            <i class="bi bi-qr-code me-1"></i>Lihat Tiket QR
+                        </a>
+                        {% endif %}
+                        {% if loan.status == "returned" %}
+                        <a class="btn btn-sm btn-outline-success" href="/loans/{{ loan.id }}/return-pdf">
+                            <i class="bi bi-file-pdf me-1"></i>Bukti Kembali
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}

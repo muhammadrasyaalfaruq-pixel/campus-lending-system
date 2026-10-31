@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Tiket Peminjaman - {{ loan.loan_code }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-1">Tiket Peminjaman</h1>
+                <p class="text-muted mb-3">Tunjukkan QR ini kepada admin saat mengambil atau mengembalikan alat.</p>
+                <img src="/loans/{{ loan.id }}/qr" alt="QR Code {{ loan.loan_code }}" class="img-fluid mb-3" style="max-width: 280px;">
+                <h2 class="h5 text-primary">{{ loan.loan_code }}</h2>
+                <p class="mb-2"><strong>{{ loan.user.name }}</strong></p>
+                <p class="small text-muted mb-3">Batas kembali: {{ loan.due_date.strftime("%d-%m-%Y") }}</p>
+                <span class="badge bg-primary">{{ loan.status }}</span>
+                <hr>
+                <ul class="list-unstyled text-start small mb-0">
+                    {% for detail in loan.details %}
+                    <li class="d-flex justify-content-between border-bottom py-2">
+                        <span>{{ detail.item.name }}</span>
+                        <span>{{ detail.quantity }} unit</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

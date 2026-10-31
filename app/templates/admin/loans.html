@@ -38,12 +38,15 @@
                             <button class="btn btn-sm btn-info text-white">Serahkan</button>
                         </form>
                         {% elif loan.status == 'borrowed' %}
-                        <form method="post" action="/admin/loans/{{ loan.id }}/return" class="d-inline">
-                            <button class="btn btn-sm btn-primary">Kembalikan</button>
-                        </form>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#returnModal{{ loan.id }}">Kembalikan</button>
                         {% else %}
                         <span class="text-muted small">Selesai</span>
                         {% endif %}
+                    {% if loan.status == "returned" %}
+                    <a href="/loans/{{ loan.id }}/return-pdf" class="btn btn-sm btn-outline-success ms-1">
+                        <i class="bi bi-file-pdf me-1"></i>Bukti
+                    </a>
+                    {% endif %}
                     </td>
                 </tr>
                 {% else %}
@@ -53,4 +56,45 @@
         </table>
     </div>
 </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% for loan in loans %}
+{% if loan.status == "borrowed" %}
+<div class="modal fade" id="returnModal{{ loan.id }}" tabindex="-1" aria-labelledby="returnModalLabel{{ loan.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnModalLabel{{ loan.id }}">Proses Pengembalian {{ loan.loan_code }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="/admin/loans/{{ loan.id }}/return">
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">Periksa kondisi tiap alat saat dikembalikan:</p>
+                    {% for detail in loan.details %}
+                    <div class="mb-3 p-3 bg-light border rounded-2">
+                        <h6 class="mb-2">{{ detail.item.name }} ({{ detail.quantity }} unit)</h6>
+                        <label class="form-label small">Kondisi saat kembali:</label>
+                        <select name="condition_after" class="form-select mb-2" required>
+                            {% for condition in ["Baik", "Rusak Ringan", "Rusak Berat"] %}
+                            <option value="{{ condition }}" {% if detail.item.condition == condition %}selected{% endif %}>{{ condition }}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="form-label small">Catatan untuk alat ini (opsional):</label>
+                        <input name="return_notes" class="form-control" placeholder="Misal: 'kabel putus', 'lensa tergores'" value="">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan & Tandai Dikembalikan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
 {% endblock %}
