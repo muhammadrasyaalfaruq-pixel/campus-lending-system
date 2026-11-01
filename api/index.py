@@ -6,20 +6,24 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from app.main import app
-    from app.main import app as fastapi_app
     from mangum import Mangum
     # Wrap FastAPI ASGI app with Mangum for AWS Lambda (Vercel runtime)
-    handler = Mangum(app)
-    handler = Mangum(fastapi_app)
-    app = handler  # Vercel looks for 'app'
+    app = Mangum(app)
 except Exception as e:
     import traceback
     error_msg = f"Failed to import app: {e}\n{traceback.format_exc()}"
     print(error_msg)
 
- @@ -26,4 +27,5 @@
+    async def fail_app(scope, receive, send):
+        await send({
+            'type': 'http.response.start',
+            'status': 500,
+            'headers': [[b'content-type', b'text/plain']],
+        })
+        await send({
             'type': 'http.response.body',
             'body': error_msg.encode(),
         })
-    handler = Mangum(fail_app)
-    app = handler
+
+    from mangum import Mangum
+    app = Mangum(fail_app)
