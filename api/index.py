@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
 
-# Add parent dir so `app` can be imported when running from `api/`
+# Add project root to sys.path for imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from app.main import app as fastapi_app
 from mangum import Mangum
-from app.main import app
 
-# Vercel looks for a top-level variable named `app`
-app = Mangum(app, lifespan="off")
+# Wrap FastAPI with Mangum for serverless
+handler = Mangum(fastapi_app, lifespan="off")
+app = handler

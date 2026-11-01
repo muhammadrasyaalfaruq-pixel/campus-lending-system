@@ -1,22 +1,30 @@
 {
   "buildCommand": "pip install -r requirements.txt",
-  "outputDirectory": ".",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
-  },
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.11"
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python@3.1.0",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "memory": 3008,
+        "timeout": 60,
+        "includeFiles": [
+          "app/**"
+        ]
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONPATH": "/var/task"
+  }
 }
