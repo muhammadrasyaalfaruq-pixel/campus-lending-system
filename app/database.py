@@ -7,7 +7,16 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost/pinjamkampus_dev")
 
-engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
+connect_args = {}
+if "tidbcloud.com" in DATABASE_URL:
+    connect_args = {
+        "ssl": {
+            "ssl_verify_cert": True,
+            "ssl_verify_identity": True,
+        }
+    }
+
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
