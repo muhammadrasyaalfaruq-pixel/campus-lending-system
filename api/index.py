@@ -5,3 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.main import app
+from mangum import Mangum
+
+# Wrap FastAPI with Mangum for serverless
+app = Mangum(app, lifespan="off")
