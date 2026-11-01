@@ -9,12 +9,13 @@ DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost/pinjam
 
 connect_args = {}
 if "tidbcloud.com" in DATABASE_URL:
-    connect_args = {
-        "ssl": {
-            "ssl_verify_cert": True,
-            "ssl_verify_identity": True,
-        }
-    }
+    # Use SSL CA if provided; otherwise disable verification to avoid runtime crash in Vercel
+    ssl_ca = os.getenv("SSL_CA_PATH")
+    if ssl_ca:
+        connect_args = {"ssl": {"ca": ssl_ca}}
+    else:
+        connect_args = {"ssl": {"ssl_verify_cert": False, "ssl_verify_identity": False}}
+
 
 engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
