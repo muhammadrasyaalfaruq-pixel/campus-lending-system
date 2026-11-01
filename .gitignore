@@ -24,3 +24,5 @@ Thumbs.db
 app/static/uploads/*
 !app/static/uploads/.gitkeep
 !app/static/uploads/*.jpg
+.vercel
+.env*

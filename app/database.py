@@ -1,4 +1,5 @@
 import os
+import ssl
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.pool import NullPool
@@ -18,10 +19,9 @@ if os.getenv("VERCEL") or os.getenv("RAILWAY_ENVIRONMENT_NAME"):
 if "tidbcloud.com" in DATABASE_URL:
     ssl_ca = os.getenv("SSL_CA_PATH")
     if ssl_ca:
-        connect_args["ssl"] = {"ca": ssl_ca}
+        connect_args["ssl"] = ssl.create_default_context(cafile=ssl_ca)
     else:
-        connect_args["ssl_verify_cert"] = False
-        connect_args["ssl_verify_identity"] = False
+        connect_args["ssl"] = ssl.create_default_context()
 
 engine_config = {
     "echo": False,
