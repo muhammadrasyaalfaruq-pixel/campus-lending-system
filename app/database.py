@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://localhost/pinjamkampus_dev")
 
-connect_args = {"timeout": 30}
+connect_args = {"connect_timeout": 30}
 pool_class = None
 
 # Serverless environment - avoid connection pooling
